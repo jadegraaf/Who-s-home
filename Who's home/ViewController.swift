@@ -9,27 +9,21 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-  //let Settings = SettingsController()
-
-  //user data
-  // Name, image on name image of name, house location
-  // joeri  J1  J0  gpsbla
   
-  // user config
-  // name GPSactivated, notification activated
+  //user data
+  // Name, id, house location
+  // joeri 0  gpsbla
   
   //override func
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    //TODO: connect to cloud and show state
+    //TODO: connect to cloud and show current state
   }
   
   override func viewDidAppear(animated: Bool) {
-    if (SettingsController().getUserName() == ""){
-      print("Name not set, going to settings page")
-      self.performSegueWithIdentifier("goToSettings", sender: self)
+    if (SettingsController().thisIsTheFirstRun() == true){
+      //self.performSegueWithIdentifier("goToSettings", sender: self)
     }
   }
   

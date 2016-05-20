@@ -11,7 +11,14 @@ import Foundation
 class SettingsController: NSObject {
   let settings = NSUserDefaults.standardUserDefaults()
   
-  internal func setUserName(userName: String) {
+  func thisIsTheFirstRun()->Bool {
+    if self.settings.stringForKey("Name" ) == nil {
+      return true
+    }
+    return false
+  }
+
+  func setUserName(userName: String) {
     self.settings.setObject(userName, forKey: "Name")
   }
   
@@ -19,7 +26,6 @@ class SettingsController: NSObject {
 
     let name = self.settings.stringForKey("Name")
     
-    print("IMHEREYO")
     if name == nil {
       return ""
     }

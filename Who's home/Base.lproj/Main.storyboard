@@ -37,7 +37,6 @@
                                 <state key="normal" image="011"/>
                                 <connections>
                                     <action selector="HomeImageClicked" destination="BYZ-38-t0r" eventType="touchUpInside" id="wNw-g5-jNZ"/>
-                                    <segue destination="Pwz-WH-VCM" kind="presentation" identifier="goToSettings" id="4cv-hm-Sxa"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Sun" translatesAutoresizingMaskIntoConstraints="NO" id="KYV-bQ-4TS">
@@ -88,11 +87,12 @@
                         <outlet property="sunImage" destination="KYV-bQ-4TS" id="dBU-cV-4f0"/>
                         <outlet property="sunImageHorizontalContraint" destination="PZs-sY-LJ0" id="POq-6Y-Scg"/>
                         <outlet property="sunImageVerticalConstraint" destination="PzA-wX-bfB" id="xga-F7-BQf"/>
+                        <segue destination="Pwz-WH-VCM" kind="presentation" identifier="goToSettings" id="hAN-Mw-B1d"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="420" y="387"/>
+            <point key="canvasLocation" x="322" y="443"/>
         </scene>
         <!--Settings-->
         <scene sceneID="5ld-pf-txy">
