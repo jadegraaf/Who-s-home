@@ -17,6 +17,7 @@ class SettingsController: NSObject {
       }
     set {
       self.settings.setObject(newValue, forKey: "Name")
+      print("Set userName to \(newValue)")
     }
   }
   
@@ -26,6 +27,7 @@ class SettingsController: NSObject {
     }
     set {
       self.settings.setInteger(newValue, forKey: "userId")
+      print("Set userId to \(newValue)")
     }
   }
   
@@ -35,6 +37,7 @@ class SettingsController: NSObject {
     }
     set{
       self.settings.setBool(newValue, forKey: "GPSEnabled")
+      print("Set GPS state to \(newValue)")
     }
   }
 
@@ -44,6 +47,7 @@ class SettingsController: NSObject {
     }
     set{
       self.settings.setBool(newValue, forKey: "NotificationsEnabled")
+      print("Set Notification state to \(newValue)")
     }
   }
   
