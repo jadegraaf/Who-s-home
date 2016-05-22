@@ -8,13 +8,11 @@
 
 import Foundation
 
-//TODO: send light command
-//TODO: fetch state
 class CloudController: NSObject {
   
   var myPhoton : SparkDevice?{
     didSet {
-      print("set to \(SparkDevice.version())")
+      print("set to \(oldValue?.version)")
     }
   }
   
@@ -57,19 +55,18 @@ class CloudController: NSObject {
     }
   }
 
-  func fetchCurrentState()->Int {
+  func fetchCurrentState() {
     self.myPhoton!.callFunction("getState", withArguments: [""]) {(resultCode: NSNumber?, error: NSError?)-> Void in
       if error == nil {
         print("Fetched state succesfully")
         
         //TODO: do some error checking if the resultcode is witnin bounds
-        self.currentState = String(resultCode)
+        self.currentState = String(format: "%03d", resultCode as! Int)
+
         // Update the house view with the state
-        var stateData = [String:String]()
-        stateData["state"] = String(format: "%03d", resultCode as! Int)
-        
-        NSNotificationCenter.defaultCenter().postNotificationName("com.jadegraaf.lamp", object: nil, userInfo: stateData)
-        }
+
+        NSNotificationCenter.defaultCenter().postNotificationName("com.jadegraaf.lamp", object: nil)
+      }
       else {
         print("Error during fetch: \(error!.code)")
       }
@@ -77,14 +74,23 @@ class CloudController: NSObject {
         print("Result of fetching: \(resultCode)")
       }
     }
-    return 1
   }
   
   // pushed the change in state to the cloud
-  func pushCurrentState(state: String){
-    self.myPhoton!.callFunction("setState", withArguments: [state]) {(resultCode: NSNumber?, error: NSError?)-> Void in
+  func pushCurrentState(state: Array<Int>){
+    var stateAsString = ""
+    
+    for element in state {
+      stateAsString += String(element)
+    }
+    self.currentState = stateAsString
+    
+    //TODO: check if the device is online or not, show error
+    
+    print("set \(stateAsString) and pushing \(state.description)")
+    self.myPhoton!.callFunction("setState", withArguments: [stateAsString]) {(resultCode: NSNumber?, error: NSError?)-> Void in
       if error == nil {
-        print("Pushed state \(state) to the cloud succesfully")
+        print("Pushed state \(stateAsString) to the cloud succesfully")
         }
       else {
         print("Error during push: \(error!.code)")
@@ -92,6 +98,13 @@ class CloudController: NSObject {
       if resultCode != nil {
         print("Result of pushing: \(resultCode)")
       }
+    }
+  }
+
+  // TODO rewrite the current state thing as a struct with properties for string and array
+  func getHouseStateAsArray()->Array<Int> {
+    return self.currentState.characters.flatMap {
+      Int(String($0))
     }
   }
 }
