@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
   
+  let CloudControl = CloudController()
+  
   //user data
   // Name, id, house location
   // joeri 0  gpsbla
@@ -18,7 +20,9 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    //TODO: connect to cloud and show current state
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.setHouseImage(_:)), name: "com.jadegraaf.lamp", object: nil)
+    // Instantiate the CloudController and make a connection
+    CloudControl.connectToCloud()
   }
   
   override func viewDidAppear(animated: Bool) {
@@ -28,7 +32,7 @@ class ViewController: UIViewController {
   }
   
   override func viewDidLayoutSubviews() {
-    
+  
     let currentHour = NSCalendar.currentCalendar().component(.Hour, fromDate: NSDate())
     //currentHourLabel.text = "\(currentHour)h"
     
@@ -77,41 +81,51 @@ class ViewController: UIViewController {
     let verticalSunPosition =  screenHeight - (radius * sin(calculatedAngle*(3.14/180)))  - imageSizeCompensation
     sunImageHorizontalContraint.constant = horizontalSunPosition
     sunImageVerticalConstraint.constant = verticalSunPosition
-    print("x:\(horizontalSunPosition) y:\(verticalSunPosition)")
+    //print("x:\(horizontalSunPosition) y:\(verticalSunPosition)")
   }
 
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
   }
-  
+
   // MARK Outlets
   @IBOutlet weak var joeriHomeSwitch: UISwitch!
-  
   @IBOutlet weak var HomeImage: UIButton!
-  
   @IBOutlet weak var backDropImage: UIImageView!
-  
   @IBOutlet weak var currentHourLabel: UILabel!
-  
   @IBOutlet weak var sunImage: UIImageView!
   @IBOutlet weak var sunImageHorizontalContraint: NSLayoutConstraint!
   @IBOutlet weak var sunImageVerticalConstraint: NSLayoutConstraint!
   // MARK: Actions
 
   @IBAction func HomeImageClicked() {
+    let state = CloudControl.currentState
+    print("HomeImageClicked things state is \(state)")
+    
+    // TODO: determine the correct image to change to based on name
+    
     if (HomeImage.currentImage == UIImage(named: "011")) {
       HomeImage.setImage(UIImage(named: "111"), forState: .Normal)
+      CloudControl.pushCurrentState("111")
       print("image changed to 111")
     }
     else {
       HomeImage.setImage(UIImage(named: "011"), forState: .Normal)
+      CloudControl.pushCurrentState("011")
       print("image changed to 011")
     }
   }
   
-  @IBAction func goToSettings() {
-    print("performing seque")
-    self.performSegueWithIdentifier("goToSettings", sender: UIButton())
+  // MARK: Functions
+  
+  // Called once the active CloudlController has made a connection and fetched the state
+  func setHouseImage(stateData: NSNotification){
+    let state = stateData.userInfo!["state"] as! String
+    print("Going to change the house image to \(state)")
+    
+    // Set the HomeImage to the current state
+    HomeImage.setImage(UIImage(named: state), forState: .Normal)
   }
+  
 }

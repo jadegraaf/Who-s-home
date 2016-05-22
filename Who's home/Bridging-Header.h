@@ -6,9 +6,9 @@
 //  Copyright © 2016 Joeri de graaf. All rights reserved.
 //
 
-#ifndef Bridging_Header_h
-#define Bridging_Header_h
+#ifndef Pods_Spark_SDK_Bridging_Header_h
+#define Pods_Spark_SDK_Bridging_Header_h
 
 #import "Spark-SDK.h"
 
-#endif /* Bridging_Header_h */
+#endif
