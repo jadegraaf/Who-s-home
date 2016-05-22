@@ -11,8 +11,8 @@ import Foundation
 class CloudController: NSObject {
   
   var myPhoton : SparkDevice?{
-    didSet {
-      print("set to \(oldValue?.version)")
+    willSet {
+      print("set to \(newValue!.version)")
     }
   }
   
@@ -57,21 +57,18 @@ class CloudController: NSObject {
 
   func fetchCurrentState() {
     self.myPhoton!.callFunction("getState", withArguments: [""]) {(resultCode: NSNumber?, error: NSError?)-> Void in
-      if error == nil {
+      if error != nil {
+        print("Error during fetch: \(error!.code)")
+      }
+      if resultCode != nil {
         print("Fetched state succesfully")
         
         //TODO: do some error checking if the resultcode is witnin bounds
         self.currentState = String(format: "%03d", resultCode as! Int)
-
+        
         // Update the house view with the state
-
+        
         NSNotificationCenter.defaultCenter().postNotificationName("com.jadegraaf.lamp", object: nil)
-      }
-      else {
-        print("Error during fetch: \(error!.code)")
-      }
-      if resultCode != nil {
-        print("Result of fetching: \(resultCode)")
       }
     }
   }
@@ -94,9 +91,6 @@ class CloudController: NSObject {
         }
       else {
         print("Error during push: \(error!.code)")
-      }
-      if resultCode != nil {
-        print("Result of pushing: \(resultCode)")
       }
     }
   }
