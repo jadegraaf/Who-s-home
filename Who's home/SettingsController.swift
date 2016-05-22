@@ -11,6 +11,42 @@ import Foundation
 class SettingsController: NSObject {
   let settings = NSUserDefaults.standardUserDefaults()
   
+  var userName: String{
+    get {
+      return self.settings.stringForKey("Name")!
+      }
+    set {
+      self.settings.setObject(newValue, forKey: "Name")
+    }
+  }
+  
+  var userId: Int{
+    get {
+      return self.settings.integerForKey("userId")
+    }
+    set {
+      self.settings.setInteger(newValue, forKey: "userId")
+    }
+  }
+  
+  var gpsState: Bool{
+    get{
+      return self.settings.boolForKey("GPSEnabled")
+    }
+    set{
+      self.settings.setBool(newValue, forKey: "GPSEnabled")
+    }
+  }
+
+  var notificationState: Bool{
+    get{
+      return self.settings.boolForKey("NotificationsEnabled")
+    }
+    set{
+      self.settings.setBool(newValue, forKey: "NotificationsEnabled")
+    }
+  }
+  
   func thisIsTheFirstRun()->Bool {
     if self.settings.stringForKey("Name" ) == nil {
       return true
@@ -18,38 +54,4 @@ class SettingsController: NSObject {
     return false
   }
 
-  func setUserName(userName: String) {
-    self.settings.setObject(userName, forKey: "Name")
-  }
-  
-  func getUserName()->String {
-
-    let name = self.settings.stringForKey("Name")
-    
-    if name == nil {
-      return ""
-    }
-
-    return name!
-  }
-  
-  func setGPSState(state: Bool) {
-    self.settings.setBool(state, forKey: "GPSEnabled")
-  }
-  
-  func getGPSState()->Bool {
-    let state = self.settings.boolForKey("GPSEnabled")
-    
-    return state
-  }
-  
-  func setNotificationState(state: Bool) {
-    self.settings.setBool(state, forKey: "NotificationEnabled")
-  }
-  
-  func getNotificationState()->Bool {
-    let state = self.settings.boolForKey("NotificationEnabled")
-    
-    return state
-  }
 }
