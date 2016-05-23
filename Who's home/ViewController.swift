@@ -18,10 +18,11 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    // TODO: How to prevent doing this again when one is already active?
-    // Instantiate the CloudController and make a connection
     print(NSDate())
+    
+    // TODO: How to prevent doing this again when one is already active?
     CloudControl.getState()
+    
     HomeImage.setImage(UIImage(named: "Loading"), forState: .Normal)
 
     // Start to listen for a state change broadcast
