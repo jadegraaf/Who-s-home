@@ -13,28 +13,30 @@ class ViewController: UIViewController {
   let CloudControl = CloudController()
   
   var StateHasLoaded = false
-  
-  //user data
-  // Name, id, house location
-  // joeri 0  gpsbla
-  
+
   //override func
   override func viewDidLoad() {
     super.viewDidLoad()
     
     // TODO: How to prevent doing this again when one is already active?
     // Instantiate the CloudController and make a connection
-    CloudControl.connectToCloud()
+    print(NSDate())
+    CloudControl.getState()
     HomeImage.setImage(UIImage(named: "Loading"), forState: .Normal)
-    
+
     // Start to listen for a state change broadcast
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHouseImage), name: "com.jadegraaf.lamp", object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHouseImage), name: "setHouseImage", object: nil)
   }
   
   override func viewDidAppear(animated: Bool) {
     if (SettingsController().thisIsTheFirstRun() == true){
       //self.performSegueWithIdentifier("goToSettings", sender: self)
     }
+  }
+  
+  // Prevent multiple cloud controllers being run
+  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    NSNotificationCenter.defaultCenter().removeObserver(self)
   }
   
   override func viewDidLayoutSubviews() {
@@ -108,10 +110,6 @@ class ViewController: UIViewController {
   // MARK: Actions
 
   @IBAction func HomeImageClicked() {
-    if CloudControl.myPhoton == nil {
-      print("Not connected yet!")
-      return
-    }
     if CloudControl.currentState == ""{
       print("State not fetched yet!")
       return
@@ -119,18 +117,23 @@ class ViewController: UIViewController {
     
     // TODO check if there is a connection
     var state = CloudControl.getHouseStateAsArray()
+    let userName = SettingsController().userName
 
     // Determine which house to change and pushes the change to the CloudController
     switch state[SettingsController().userId] {
     case 0:
       state[SettingsController().userId] = 1
-      CloudControl.pushCurrentState(state)
+      
+      CloudControl.updateCurrentState(state)
+      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])1")
       print("state is 0 and should be 1. Image to set: \(CloudControl.currentState)")
       HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
       break
     case 1:
       state[SettingsController().userId] = 0
-      CloudControl.pushCurrentState(state)
+      
+      CloudControl.updateCurrentState(state)
+      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])0")
       print("state is 1 and should be 0. Image to set: \(CloudControl.currentState)")
       HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
       break
@@ -144,14 +147,19 @@ class ViewController: UIViewController {
   func setHouseImage(){
     if !self.StateHasLoaded {
       self.StateHasLoaded = true
-      LoadingStack.hidden = true
-      LoadingIndicator.stopAnimating()
+      dispatch_async(dispatch_get_main_queue(), {
+        self.LoadingStack.hidden = true
+        self.LoadingIndicator.stopAnimating()
+      })
+
     }
     
     print("Going to change the house image to \(CloudControl.currentState)")
     
     // Set the HomeImage to the current state
-    HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
+    dispatch_async(dispatch_get_main_queue(), {
+      self.HomeImage.setImage(UIImage(named: self.CloudControl.currentState), forState: .Normal)
+    })
   }
   
 }

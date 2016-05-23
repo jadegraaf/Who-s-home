@@ -10,89 +10,115 @@ import Foundation
 
 class CloudController: NSObject {
   
-  var myPhoton : SparkDevice?{
-    willSet {
-      print("set to \(newValue!.version)")
-    }
-  }
+  let accessToken = "040b519d727af3e70a99e051f39624ba08515e5b"
+  let deviceId = "400021001247343339383037"
+  let particleAPIBaseUrl = "https://api.particle.io"
   
   var currentState = ""{
     willSet{
       print("state changed to \(newValue)")
+      NSNotificationCenter.defaultCenter().postNotificationName("setHouseImage", object: nil)
     }
   }
   
-  // Login to the cloud and make a connection to the right device and get the current state
-  func connectToCloud(){
-    SparkCloud.sharedInstance().loginWithUser("joeridegraaf@me.com", password: "Asg-6qM-V2Q-awX") { (error:NSError?) -> Void in
-      if error != nil {
-        print("Wrong credentials or no internet connectivity, please try again")
+  override init() {
+    super.init()
+    
+    // Observe if the app enters the foreground, then update the screen
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(getState), name: "UIApplicationWillEnterForegroundNotification", object: nil)
+  }
+  
+  func getState() {
+    let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+    
+    let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState");
+    print("POST url string is \(urlString)")
+    let request : NSMutableURLRequest = NSMutableURLRequest()
+    request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
+    request.HTTPMethod = "POST"
+    request.timeoutInterval = 30
+    request.addValue("application/json", forHTTPHeaderField: "Accept")
+    request.HTTPBody  = "arg=&access_token=\(self.accessToken)".dataUsingEncoding(NSUTF8StringEncoding)
+    
+    let dataTask = session.dataTaskWithRequest(request) {
+      (let data: NSData?, let response: NSURLResponse?, let error: NSError?) -> Void in
+      guard let httpResponse = response as? NSHTTPURLResponse, receivedData = data
+        else {
+          print("error: not a valid http response")
+          return
       }
-      else {
-        print("Logged in")
+      switch (httpResponse.statusCode) {
+      case 200:
+        do {
+          let response = try NSJSONSerialization.JSONObjectWithData(receivedData, options: .AllowFragments)
+          
+          let state = String(format: "%03d", response["return_value"] as! Int)
+          self.currentState = state
+        }
+        catch {
+          print("error serializing JSON: \(error)")
+        }
+      case 400:
+        print("Invalid POST request")
+      break
         
-        // Now locate the Lamp device and set it as active
-        SparkCloud.sharedInstance().getDevices { (sparkDevices:[AnyObject]?, error:NSError?) -> Void in
-          if error != nil {
-            print("Check your internet connectivity")
-            print(error)
-          }
-          else {
-            if let devices = sparkDevices as? [SparkDevice] {
-              for device in devices {
-                if device.name == "Lamp" {
-                  self.myPhoton = device
-                  print("Found Lamp")
-                  
-                  // Now we have a active connection, fetch the current state in the lamp and update the screen
-                  self.fetchCurrentState()
-                }
-              }
-            }
+      default:
+        print("POST request got response \(httpResponse.statusCode)")
+      }
+    }
+    dataTask.resume()
+  }
+  
+  func changeState(command: String) {
+    let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+    
+    let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState");
+    print("POST url string is \(urlString)")
+    let request : NSMutableURLRequest = NSMutableURLRequest()
+    request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
+    request.HTTPMethod = "POST"
+    request.timeoutInterval = 30
+    request.addValue("application/json", forHTTPHeaderField: "Accept")
+    request.HTTPBody  = "arg=\(command)&access_token=\(self.accessToken)".dataUsingEncoding(NSUTF8StringEncoding)
+    
+    let dataTask = session.dataTaskWithRequest(request) {
+      (let data: NSData?, let response: NSURLResponse?, let error: NSError?) -> Void in
+      guard let httpResponse = response as? NSHTTPURLResponse, receivedData = data
+        else {
+          print("error: not a valid http response")
+          return
+      }
+      switch (httpResponse.statusCode) {
+      case 200:
+        do {
+          let response = try NSJSONSerialization.JSONObjectWithData(receivedData, options: .AllowFragments)
+          
+          if (response["return_value"] as! Int == 0) {
+            print("Not able to push state")
           }
         }
+        catch {
+          print("error serializing JSON: \(error)")
+        }
+      case 400:
+        print("Invalid POST request")
+        break
+        
+      default:
+        print("POST request got response \(httpResponse.statusCode)")
       }
     }
-  }
-
-  func fetchCurrentState() {
-    self.myPhoton!.callFunction("getState", withArguments: [""]) {(resultCode: NSNumber?, error: NSError?)-> Void in
-      if error != nil {
-        print("Error during fetch: \(error!.code)")
-      }
-      if resultCode != nil {
-        print("Fetched state succesfully")
-        
-        //TODO: do some error checking if the resultcode is witnin bounds
-        self.currentState = String(format: "%03d", resultCode as! Int)
-        
-        // Update the house view with the state
-        
-        NSNotificationCenter.defaultCenter().postNotificationName("com.jadegraaf.lamp", object: nil)
-      }
-    }
+    dataTask.resume()
   }
   
   // pushed the change in state to the cloud
-  func pushCurrentState(state: Array<Int>){
+  func updateCurrentState(state: Array<Int>){
     var stateAsString = ""
     
     for element in state {
       stateAsString += String(element)
     }
     self.currentState = stateAsString
-    
-    //TODO: check if the device is online or not, show error
-    
-    print("set \(stateAsString) and pushing \(state.description)")
-    self.myPhoton!.callFunction("setState", withArguments: [stateAsString]) {(resultCode: NSNumber?, error: NSError?)-> Void in
-      if error == nil {
-        print("Pushed state \(stateAsString) to the cloud succesfully")
-        }
-      else {
-        print("Error during push: \(error!.code)")
-      }
-    }
   }
 
   // TODO rewrite the current state thing as a struct with properties for string and array
