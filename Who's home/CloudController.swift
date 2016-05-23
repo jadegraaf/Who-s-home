@@ -17,6 +17,8 @@ class CloudController: NSObject {
   var currentState = ""{
     willSet{
       print("state changed to \(newValue)")
+    }
+    didSet {
       NSNotificationCenter.defaultCenter().postNotificationName("setHouseImage", object: nil)
     }
   }
@@ -32,8 +34,8 @@ class CloudController: NSObject {
     let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
     
     let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState");
-    print("POST url string is \(urlString)")
     let request : NSMutableURLRequest = NSMutableURLRequest()
+
     request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
     request.HTTPMethod = "POST"
     request.timeoutInterval = 30
@@ -73,8 +75,8 @@ class CloudController: NSObject {
     let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
     
     let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState");
-    print("POST url string is \(urlString)")
     let request : NSMutableURLRequest = NSMutableURLRequest()
+ 
     request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
     request.HTTPMethod = "POST"
     request.timeoutInterval = 30
