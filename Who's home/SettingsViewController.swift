@@ -10,7 +10,7 @@ import UIKit
 
 class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
   
-  var namePickerData = ["", "Joeri", "Maya", "Bart"]
+  var namePickerData = ["Select", "Joeri", "Maya", "Bart"]
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -47,8 +47,17 @@ class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerVi
   
   // Capture the picker view selection
   func pickerView(namePickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-    SettingsController().userId = row-1
-    SettingsController().userName = self.namePickerData[row]
+    if row == 0 {
+      BackButton.hidden = true
+    }
+    else {
+      // Store the user data
+      SettingsController().userId = row-1
+      SettingsController().userName = self.namePickerData[row]
+      
+      // Show the back button again
+      BackButton.hidden = false
+    }
   }
   
   // MARK: UIPicker stuff
