@@ -38,6 +38,7 @@ class ViewController: UIViewController {
   // Prevent multiple cloud controllers being run
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     NSNotificationCenter.defaultCenter().removeObserver(self)
+    NSNotificationCenter.defaultCenter().removeObserver(CloudControl)
   }
   
   override func viewDidLayoutSubviews() {
@@ -99,7 +100,6 @@ class ViewController: UIViewController {
   }
 
   // MARK Outlets
-  @IBOutlet weak var joeriHomeSwitch: UISwitch!
   @IBOutlet weak var HomeImage: UIButton!
   @IBOutlet weak var backDropImage: UIImageView!
   @IBOutlet weak var currentHourLabel: UILabel!
