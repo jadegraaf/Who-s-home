@@ -31,7 +31,7 @@ class ViewController: UIViewController {
   
   override func viewDidAppear(animated: Bool) {
     if (SettingsController().thisIsTheFirstRun() == true){
-      //self.performSegueWithIdentifier("goToSettings", sender: self)
+      self.performSegueWithIdentifier("goToSettings", sender: self)
     }
   }
   
