@@ -126,7 +126,7 @@ class ViewController: UIViewController {
       state[SettingsController().userId] = 1
       
       CloudControl.updateCurrentState(state)
-      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])1")
+      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])1", runInBackground: false)
       print("state is 0 and should be 1. Image to set: \(CloudControl.currentState)")
       HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
       break
@@ -134,7 +134,7 @@ class ViewController: UIViewController {
       state[SettingsController().userId] = 0
       
       CloudControl.updateCurrentState(state)
-      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])0")
+      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])0", runInBackground: false)
       print("state is 1 and should be 0. Image to set: \(CloudControl.currentState)")
       HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
       break

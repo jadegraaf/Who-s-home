@@ -48,6 +48,13 @@ class SettingsController: NSObject {
     set{
       self.settings.setBool(newValue, forKey: "NotificationsEnabled")
       print("Set Notification state to \(newValue)")
+      
+      if newValue == true {
+        NSNotificationCenter.defaultCenter().postNotificationName("registerNotifications", object: nil)
+      }
+      else {
+        NSNotificationCenter.defaultCenter().postNotificationName("cancelNotifications", object: nil)
+      }
     }
   }
   
