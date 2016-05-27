@@ -10,18 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
   
-  let CloudControl = CloudController()
-  
   var StateHasLoaded = false
 
   //override func
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    print(NSDate())
-    
-    // TODO: How to prevent doing this again when one is already active?
-    CloudControl.getState()
+    CloudController.sharedInstance.getState()
     
     HomeImage.setImage(UIImage(named: "Loading"), forState: .Normal)
 
@@ -38,13 +33,11 @@ class ViewController: UIViewController {
   // Prevent multiple cloud controllers being run
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     NSNotificationCenter.defaultCenter().removeObserver(self)
-    NSNotificationCenter.defaultCenter().removeObserver(CloudControl)
   }
   
   override func viewDidLayoutSubviews() {
   
     let currentHour = NSCalendar.currentCalendar().component(.Hour, fromDate: NSDate())
-    //currentHourLabel.text = "\(currentHour)h"
     
     var usedHour = 0
     
@@ -91,12 +84,6 @@ class ViewController: UIViewController {
     let verticalSunPosition =  screenHeight - (radius * sin(calculatedAngle*(3.14/180)))  - imageSizeCompensation
     sunImageHorizontalContraint.constant = horizontalSunPosition
     sunImageVerticalConstraint.constant = verticalSunPosition
-    //print("x:\(horizontalSunPosition) y:\(verticalSunPosition)")
-  }
-
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
   }
 
   // MARK Outlets
@@ -108,16 +95,16 @@ class ViewController: UIViewController {
   @IBOutlet weak var sunImageVerticalConstraint: NSLayoutConstraint!
   @IBOutlet weak var LoadingStack: UIStackView!
   @IBOutlet weak var LoadingIndicator: UIActivityIndicatorView!
-  // MARK: Actions
 
+  // MARK: Actions
   @IBAction func HomeImageClicked() {
-    if CloudControl.currentState == ""{
+    if CloudController.sharedInstance.currentState == ""{
       print("State not fetched yet!")
       return
     }
     
     // TODO check if there is a connection
-    var state = CloudControl.getHouseStateAsArray()
+    var state = CloudController.sharedInstance.getHouseStateAsArray()
     let userName = SettingsController().userName
 
     // Determine which house to change and pushes the change to the CloudController
@@ -125,25 +112,29 @@ class ViewController: UIViewController {
     case 0:
       state[SettingsController().userId] = 1
       
-      CloudControl.updateCurrentState(state)
-      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])1", runInBackground: false)
-      print("state is 0 and should be 1. Image to set: \(CloudControl.currentState)")
-      HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
+      CloudController.sharedInstance.updateCurrentState(state)
+      CloudController.sharedInstance.changeState("\(userName[userName.startIndex.advancedBy(0)])1", runInBackground: false)
+ 
+      print("state is 0 and should be 1. Image to set: \(CloudController.sharedInstance.currentState)")
+      
+      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
       break
+      
     case 1:
       state[SettingsController().userId] = 0
       
-      CloudControl.updateCurrentState(state)
-      CloudControl.changeState("\(userName[userName.startIndex.advancedBy(0)])0", runInBackground: false)
-      print("state is 1 and should be 0. Image to set: \(CloudControl.currentState)")
-      HomeImage.setImage(UIImage(named: CloudControl.currentState), forState: .Normal)
+      CloudController.sharedInstance.updateCurrentState(state)
+      CloudController.sharedInstance.changeState("\(userName[userName.startIndex.advancedBy(0)])0", runInBackground: false)
+      
+      print("state is 1 and should be 0. Image to set: \(CloudController.sharedInstance.currentState)")
+      
+      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
       break
     default: break
     }
   }
   
   // MARK: Functions
-  
   // Called once the active CloudlController has made a connection and fetched the state
   func setHouseImage(){
     if !self.StateHasLoaded {
@@ -155,12 +146,11 @@ class ViewController: UIViewController {
 
     }
     
-    print("Going to change the house image to \(CloudControl.currentState)")
+    print("Going to change the house image to \(CloudController.sharedInstance.currentState)")
     
     // Set the HomeImage to the current state
     dispatch_async(dispatch_get_main_queue(), {
-      self.HomeImage.setImage(UIImage(named: self.CloudControl.currentState), forState: .Normal)
+      self.HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
     })
   }
-  
 }
