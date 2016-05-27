@@ -26,9 +26,10 @@ class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerVi
     // Select the components to the state found in the settings if its not
     else {
       NamePicker.selectRow(SettingsController().userId+1, inComponent: 0, animated: true)
-      GPSButton.on = SettingsController().gpsState
-      NotificationButton.on = SettingsController().notificationState
     }
+    
+    GPSButton.on = SettingsController().gpsState
+    NotificationButton.on = SettingsController().notificationState
   }
   
   // MARK Outlets

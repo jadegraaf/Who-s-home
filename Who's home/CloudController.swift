@@ -21,7 +21,7 @@ class CloudController: NSObject, NSURLSessionDelegate {
     }
   }
   
-  private override init() {
+  override init() {
     super.init()
     
     // Observe if the app enters the foreground, then update the screen
@@ -81,9 +81,9 @@ class CloudController: NSObject, NSURLSessionDelegate {
     switch runInBackground {
     case true:
       
-      let session = NSURLSession(configuration: NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("changeState"), delegate: self, delegateQueue: nil)
+      let backgroundSession = NSURLSession(configuration: NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("changeState"), delegate: CloudController.sharedInstance, delegateQueue: nil)
       
-      let dataTask = session.downloadTaskWithRequest(request)
+      let dataTask = backgroundSession.downloadTaskWithRequest(request)
       
       dataTask.resume()
       

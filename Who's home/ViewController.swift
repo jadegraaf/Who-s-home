@@ -103,7 +103,6 @@ class ViewController: UIViewController {
       return
     }
     
-    // TODO check if there is a connection
     var state = CloudController.sharedInstance.getHouseStateAsArray()
     let userName = SettingsController().userName
 
