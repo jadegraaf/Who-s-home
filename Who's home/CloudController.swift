@@ -9,21 +9,19 @@
 import Foundation
 
 class CloudController: NSObject, NSURLSessionDelegate {
+  static let sharedInstance = CloudController()
   
   let accessToken = "040b519d727af3e70a99e051f39624ba08515e5b"
   let deviceId = "400021001247343339383037"
   let particleAPIBaseUrl = "https://api.particle.io"
   
   var currentState = ""{
-    willSet{
-      print("state changed to \(newValue)")
-    }
     didSet {
       NSNotificationCenter.defaultCenter().postNotificationName("setHouseImage", object: nil)
     }
   }
   
-  override init() {
+  private override init() {
     super.init()
     
     // Observe if the app enters the foreground, then update the screen
@@ -72,8 +70,6 @@ class CloudController: NSObject, NSURLSessionDelegate {
   }
   
   func changeState(command: String, runInBackground: Bool) {
-    print("Recieved command: \(command) with background: \(runInBackground)")
-    
     let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState");
  
     let request : NSMutableURLRequest = NSMutableURLRequest()
