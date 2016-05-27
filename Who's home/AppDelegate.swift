@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-    // Override point for customization after application launch.
+    print("App launched at \(NSDate())")
     
     // Remove old notifications
     UIApplication.sharedApplication().cancelAllLocalNotifications()
@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-    scheduleNotification()
+    scheduleNotification(false)
   }
   
   func application(application: UIApplication,
@@ -66,11 +66,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let userName = NSUserDefaults.standardUserDefaults().stringForKey("Name")
         let command = "\(userName![userName!.startIndex.advancedBy(0)])1"
         
-        CloudController().changeState(command, runInBackground: true)
+        CloudController.sharedInstance.changeState(command, runInBackground: true)
         
         break
       case actionName.later:
+        // First cancel the delivery of all notifications
+        UIApplication.sharedApplication().cancelAllLocalNotifications()
+        
         //TODO: Schedule notification in a hour
+        self.scheduleNotification(true)
+        
         break
       }
     }
@@ -139,16 +144,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   // schedule the notification io app launch or settings change. Pass time as parameter?
-  func scheduleNotification() {
+  func scheduleNotification(rescheduleNotifications: Bool) {
     // Schedule the notification ********************************************
     if UIApplication.sharedApplication().scheduledLocalNotifications!.count == 0 {
       
       let notification = UILocalNotification()
-      notification.alertBody = "Thuis?"
+      notification.alertBody = "Thuis 2.0?"
       notification.soundName = UILocalNotificationDefaultSoundName
-      notification.fireDate = NSDate()
+      
+      let calendar: NSCalendar! = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+      
+      // Determine if the notifications should be rescheduled (due to the user clicking on the 'later' action) or just schedule them
+      switch rescheduleNotifications {
+      case false:
+        notification.fireDate = NSDate()// calendar.dateBySettingHour(18, minute: 00, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
+      case true:
+        let hour = calendar.component(.Hour, fromDate: NSDate())
+        let minute = calendar.component(.Minute, fromDate: NSDate())
+        print("rescheduling the notification to \(hour):\(minute+2)")
+        
+        notification.fireDate = calendar.dateBySettingHour(hour, minute: minute+2, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
+        
+        print(UIApplication.sharedApplication().scheduledLocalNotifications.debugDescription)
+      }
+      
+      print(notification.fireDate)
+      
       notification.category = categoryID
-      notification.repeatInterval = NSCalendarUnit.Minute
+      //notification.repeatInterval = 0
       
       UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
