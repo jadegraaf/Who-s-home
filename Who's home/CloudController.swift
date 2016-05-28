@@ -17,6 +17,7 @@ class CloudController: NSObject, NSURLSessionDelegate {
   
   var currentState = ""{
     didSet {
+      // Broadcast a notification to the ViewController to updated the screen
       NSNotificationCenter.defaultCenter().postNotificationName("setHouseImage", object: nil)
     }
   }
@@ -24,10 +25,11 @@ class CloudController: NSObject, NSURLSessionDelegate {
   override init() {
     super.init()
     
-    // Observe if the app enters the foreground, then update the screen
+    // Observe if the app enters the foreground, then fetch the current state
     NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(getState), name: "UIApplicationWillEnterForegroundNotification", object: nil)
   }
   
+  // Fetches the current state from the cloud
   func getState() {
     let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
     
@@ -69,6 +71,7 @@ class CloudController: NSObject, NSURLSessionDelegate {
     dataTask.resume()
   }
   
+  // Pushes the change in state to the cloud. Run in the background if called from a notification action
   func changeState(command: String, runInBackground: Bool) {
     let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState");
  
@@ -83,6 +86,7 @@ class CloudController: NSObject, NSURLSessionDelegate {
       
       let backgroundSession = NSURLSession(configuration: NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("changeState"), delegate: CloudController.sharedInstance, delegateQueue: nil)
       
+      // Uses downloadTask due to iOS not allowing dataTask in the background
       let dataTask = backgroundSession.downloadTaskWithRequest(request)
       
       dataTask.resume()
@@ -129,14 +133,19 @@ class CloudController: NSObject, NSURLSessionDelegate {
     }
   }
   
-  // pushed the change in state to the cloud
-  func updateCurrentState(state: Array<Int>){
+  // Updates the current state from the array computed in the ViewController
+  func updateCurrentState(state: Array<Int>, command: String){
     var stateAsString = ""
     
     for element in state {
       stateAsString += String(element)
     }
+    
+    // Set the current state
     self.currentState = stateAsString
+    
+    // Push the change to the cloud
+    self.changeState(command, runInBackground: false)
   }
 
   // TODO rewrite the current state thing as a struct with properties for string and array
