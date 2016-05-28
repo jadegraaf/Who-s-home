@@ -31,6 +31,9 @@ class CloudController: NSObject, NSURLSessionDelegate {
   
   // Fetches the current state from the cloud
   func getState() {
+    // Broadcast that the state is being loaded
+    NSNotificationCenter.defaultCenter().postNotificationName("fetchingState", object: nil)
+    
     let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
     
     let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState");

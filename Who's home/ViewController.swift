@@ -29,6 +29,7 @@ class ViewController: UIViewController {
     
     // Start to listen for a state change broadcast
     NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHouseImage), name: "setHouseImage", object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(showLoadingActifityMonitor), name: "fetchingState", object: nil)
   }
   
   override func viewDidAppear(animated: Bool) {
@@ -164,14 +165,12 @@ class ViewController: UIViewController {
   // MARK: Functions
   // Called once the active CloudlController has made a connection and fetched the state and updates the screen with the right house status representation image
   func setHouseImage(){
-    if !self.StateHasLoaded {
-      self.StateHasLoaded = true
-      dispatch_async(dispatch_get_main_queue(), {
-        self.LoadingStack.hidden = true
-        self.LoadingIndicator.stopAnimating()
-      })
-
-    }
+    self.StateHasLoaded = true
+    
+    dispatch_async(dispatch_get_main_queue(), {
+      self.LoadingStack.hidden = true
+      self.LoadingIndicator.stopAnimating()
+    })
     
     print("Going to change the house image to \(CloudController.sharedInstance.currentState)")
     
@@ -184,5 +183,13 @@ class ViewController: UIViewController {
   // Disables interaction with the house image for 5 seconds to prevent the user from spamming it. You know who are you....
   func enableHouseImageInteraction() {
     self.HomeImage.userInteractionEnabled = true
+  }
+  
+  // Shows the 'Loading' activity monitor
+  func showLoadingActifityMonitor() {
+    self.StateHasLoaded = false
+    
+    self.LoadingStack.hidden = false
+    self.LoadingIndicator.startAnimating()
   }
 }
