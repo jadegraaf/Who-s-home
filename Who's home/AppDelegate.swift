@@ -56,12 +56,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Handle notification action *****************************************
     if notification.category == categoryID {
       
-      
       let action:actionName = actionName(rawValue: identifier!)!
       
-      
       switch action{
-        
       case actionName.isHome:
         let userName = NSUserDefaults.standardUserDefaults().stringForKey("Name")
         let command = "\(userName![userName!.startIndex.advancedBy(0)])1"
@@ -135,13 +132,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // Determine if the notifications should be rescheduled (due to the user clicking on the 'later' action) or just schedule them
       switch rescheduleNotifications {
       case false:
-        notification.fireDate = NSDate()// calendar.dateBySettingHour(18, minute: 00, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
+        notification.fireDate = calendar.dateBySettingHour(18, minute: 1, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
       case true:
         let hour = calendar.component(.Hour, fromDate: NSDate())
-        let minute = calendar.component(.Minute, fromDate: NSDate())
-        print("rescheduling the notification to \(hour):\(minute+2)")
+        print("rescheduling the notification to \(hour):\(hour+1)")
         
-        notification.fireDate = calendar.dateBySettingHour(hour, minute: minute+2, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
+        notification.fireDate = calendar.dateBySettingHour(hour+1, minute: 0, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
         
         print(UIApplication.sharedApplication().scheduledLocalNotifications.debugDescription)
       }
