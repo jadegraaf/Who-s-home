@@ -135,17 +135,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         notification.fireDate = calendar.dateBySettingHour(18, minute: 1, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
       case true:
         let hour = calendar.component(.Hour, fromDate: NSDate())
-        print("rescheduling the notification to \(hour):\(hour+1)")
-        
+
         notification.fireDate = calendar.dateBySettingHour(hour+1, minute: 0, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
-        
-        print(UIApplication.sharedApplication().scheduledLocalNotifications.debugDescription)
       }
       
       print(notification.fireDate)
       
       notification.category = categoryID
-      //notification.repeatInterval = 0
       
       UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
@@ -156,4 +152,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     UIApplication.sharedApplication().cancelAllLocalNotifications()
   }
 }
-
