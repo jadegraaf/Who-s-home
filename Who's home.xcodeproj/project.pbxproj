@@ -38,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D00646F81CFA663A00582FDB /* photon-code.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "photon-code.c"; sourceTree = "<group>"; };
 		D00B2FE81CEFB201000D46F6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		D04FDC141CE91A8B006D8550 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		D04FDC161CEA4851006D8550 /* CloudController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudController.swift; sourceTree = "<group>"; };
@@ -117,6 +118,7 @@
 			children = (
 				D0FD083D1CA73AA000B47B6B /* Info.plist */,
 				D0FD08311CA73AA000B47B6B /* AppDelegate.swift */,
+				D00646F81CFA663A00582FDB /* photon-code.c */,
 				D04FDC161CEA4851006D8550 /* CloudController.swift */,
 				D050C4FC1CEF24630062FEE8 /* SettingsController.swift */,
 				D04FDC141CE91A8B006D8550 /* SettingsViewController.swift */,
