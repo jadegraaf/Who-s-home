@@ -67,9 +67,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         break
       case actionName.later:
-        // First cancel the delivery of all notifications
-        UIApplication.sharedApplication().cancelAllLocalNotifications()
-        
         // Schedule notification in a hour
         self.scheduleNotification(true)
         
@@ -124,7 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if UIApplication.sharedApplication().scheduledLocalNotifications!.count == 0 {
       
       let notification = UILocalNotification()
-      notification.alertBody = "Thuis 2.0?"
+      notification.alertBody = "Thuis?"
       notification.soundName = UILocalNotificationDefaultSoundName
       
       let calendar: NSCalendar! = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
@@ -132,7 +129,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // Determine if the notifications should be rescheduled (due to the user clicking on the 'later' action) or just schedule them
       switch rescheduleNotifications {
       case false:
+        // Schedule the notification to one minute past 18 since the lamp turns on at 18 precise
         notification.fireDate = calendar.dateBySettingHour(18, minute: 1, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
+        
+        // Repeat this notification every day
+        notification.repeatInterval = .Day
       case true:
         let hour = calendar.component(.Hour, fromDate: NSDate())
 
