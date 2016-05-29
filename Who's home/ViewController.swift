@@ -49,10 +49,17 @@ class ViewController: UIViewController {
     // Determing the current hour
     let currentHour = NSCalendar.currentCalendar().component(.Hour, fromDate: NSDate())
     
-    var usedHour: Int
-    var phaseDuration: Int
+    // How far are we in the current day/night phase?
+    var momentInPhase = 0
     
+    // The duration of the current phase
+    var phaseDuration = 0
+    
+    // Hour of day the sun rises
+    // TODO: calculate these based on the location and time of year
     let sunRiseHour = 6
+    
+    // Hour of the day the sun sets
     let sunSetHour = 21
 
     // Determing which hour to base the position of the sun/moon on based on their distance from sun set/rise and set the correct background
@@ -64,15 +71,17 @@ class ViewController: UIViewController {
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
       phaseDuration = 24-sunSetHour+sunRiseHour
       
-      usedHour = currentHour + 4
+      // Determine how far from the start of the phase we are
+      momentInPhase = currentHour + 4
     case 21...23:
       backDropImage.image = UIImage(named: "Night backdrop")
       sunImage.image = UIImage(named: "Moon")
      
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
       phaseDuration = 24-sunSetHour+sunRiseHour
-     
-      usedHour = currentHour-19
+      
+      // Determine how far from the start of the phase we are
+      momentInPhase = currentHour-19
     case 7...20:
       backDropImage.image = UIImage(named: "Day backdrop")
       sunImage.image = UIImage(named: "Sun")
@@ -80,10 +89,10 @@ class ViewController: UIViewController {
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
       phaseDuration = sunSetHour-sunRiseHour
       
-      usedHour = currentHour-7
+      // Determine how far from the start of the phase we are
+      momentInPhase = currentHour-7
     default:
-      usedHour = 0
-      phaseDuration = 0
+      break
     }
     
     // Get the width and height of the screen, used to determing the position proportionaly to the background image
@@ -94,16 +103,16 @@ class ViewController: UIViewController {
     let radius = screenHeight * 0.71
     
     // Since the constrainst are from the right and top edge of the image, calculate where the center is relatively to the size
-    let imageSizeCompensation = sunImage.frame.height * 0.5
+    let imageSizeCompensation = sunImage.frame.height * 0.5 - 5
     
     // The starting angle is the amount of degrees between the horizon at the circle midpoint and a line from the circle midpoint to where it will intersect the left edge of the screen
     let startingAngle = CGFloat( acos( (0.5 * screenWidth) / radius) * (180 / 3.14))
     
     // This divides the range of degrees from the left edge of the screen to the right, divided by 12 hours times the current hour
-    let calculatedAngle = startingAngle+((( 2 * (90 - startingAngle)) / CGFloat(phaseDuration)) * CGFloat(usedHour+1))
+    let calculatedAngle = startingAngle+((( 2 * (90 - startingAngle)) / CGFloat(phaseDuration)) * CGFloat(momentInPhase+1))
     
     // Using the calculatedAngle, the horizontal and vertical positions are calculated using trigonometry
-    let horizontalSunPosition = (0.5 * screenWidth) - 40 - (radius * cos((calculatedAngle*(3.14/180))))
+    let horizontalSunPosition = (0.5 * screenWidth) - (radius * cos((calculatedAngle*(3.14/180))))  - imageSizeCompensation
     let verticalSunPosition =  screenHeight - (radius * sin(calculatedAngle*(3.14/180)))  - imageSizeCompensation
     
     // Change the position of the sun/moon
@@ -123,7 +132,7 @@ class ViewController: UIViewController {
 
   // MARK: Actions
   @IBAction func HomeImageClicked() {
-    // Determine if the current house state has succesfully been loaded
+    // Determine if the current house state has succesfully been loaded otherwise ignore the action
     if CloudController.sharedInstance.currentState == ""{
       print("State not fetched yet!")
       return
@@ -145,7 +154,6 @@ class ViewController: UIViewController {
       state[SettingsController().userId] = 1
       
       CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)1")
-      //CloudController.sharedInstance.changeState("\(firstLetterOfUserName)1", runInBackground: false)
  
       HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
       break
@@ -154,7 +162,6 @@ class ViewController: UIViewController {
       state[SettingsController().userId] = 0
       
       CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)0")
-      //CloudController.sharedInstance.changeState("\(firstLetterOfUserName)0", runInBackground: false)
       
       HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
       break
