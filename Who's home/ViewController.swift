@@ -57,40 +57,40 @@ class ViewController: UIViewController {
     
     // Hour of day the sun rises
     // TODO: calculate these based on the location and time of year
-    let sunRiseHour = 6
+    let sunRiseHour = 7
     
     // Hour of the day the sun sets
     let sunSetHour = 21
-
+    
     // Determing which hour to base the position of the sun/moon on based on their distance from sun set/rise and set the correct background
     switch currentHour {
-    case 0...sunRiseHour:
+    case 0...(sunRiseHour-1):
       backDropImage.image = UIImage(named: "Night backdrop")
       sunImage.image = UIImage(named: "Moon")
       
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
-      phaseDuration = 24-sunSetHour+sunRiseHour
+      phaseDuration = 24 - sunSetHour + sunRiseHour - 1
       
       // Determine how far from the start of the phase we are
-      momentInPhase = currentHour + 4
-    case 21...23:
+      momentInPhase = currentHour + 2
+    case (sunSetHour+1)...23:
       backDropImage.image = UIImage(named: "Night backdrop")
       sunImage.image = UIImage(named: "Moon")
-     
+  
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
-      phaseDuration = 24-sunSetHour+sunRiseHour
+      phaseDuration = 24 - sunSetHour+sunRiseHour
       
       // Determine how far from the start of the phase we are
-      momentInPhase = currentHour-19
-    case 7...20:
+      momentInPhase = currentHour - sunSetHour
+    case sunRiseHour...sunSetHour:
       backDropImage.image = UIImage(named: "Day backdrop")
       sunImage.image = UIImage(named: "Sun")
       
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
-      phaseDuration = sunSetHour-sunRiseHour
+      phaseDuration = sunSetHour - sunRiseHour + 1
       
       // Determine how far from the start of the phase we are
-      momentInPhase = currentHour-7
+      momentInPhase = currentHour - sunRiseHour
     default:
       break
     }
