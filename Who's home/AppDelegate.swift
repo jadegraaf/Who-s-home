@@ -129,7 +129,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // Determine if the notifications should be rescheduled (due to the user clicking on the 'later' action) or just schedule them
       switch rescheduleNotifications {
       case false:
-        // Schedule the notification to one minute past 18 since the lamp turns on at 18 precise
+        // Schedule the notification to one minute past 18 since the lamp turns on at 18 precise so it might not recieve the command.
         notification.fireDate = calendar.dateBySettingHour(18, minute: 1, second: 0, ofDate: NSDate(), options: NSCalendarOptions.MatchFirst)!
         
         // Repeat this notification every day

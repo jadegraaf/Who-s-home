@@ -224,6 +224,7 @@
 				TargetAttributes = {
 					D0FD082D1CA73AA000B47B6B = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = D7T2SM46G4;
 					};
 					D0FD08411CA73AA000B47B6B = {
 						CreatedOnToolsVersion = 7.3;
@@ -446,9 +447,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "Who's home/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-home";
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeridegraaf.whoishome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "9e7456d2-1cc1-426b-acc3-94875ad8ac3c";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -464,9 +465,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "Who's home/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-home";
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeridegraaf.whoishome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "9e7456d2-1cc1-426b-acc3-94875ad8ac3c";
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
