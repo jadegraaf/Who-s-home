@@ -41,26 +41,26 @@ class CloudController: NSObject, URLSessionDelegate {
     let postString = "arg=&access_token=\(self.accessToken)"
     request.httpBody = postString.data(using: .utf8)
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
-        guard let data = data, error == nil else {
-            print("error=\(error)")
-            return
-        }
+      guard let data = data, error == nil else {
+        print("error=\(error)")
+        return
+      }
+
+      if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+        print("statusCode should be 200, but is \(httpStatus.statusCode)")
+        print("response = \(response)")
+        return
+      }
+
+      do {
+        let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
         
-        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-            print("statusCode should be 200, but is \(httpStatus.statusCode)")
-            print("response = \(response)")
-            return
-        }
-        
-        do {
-            let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
-          
-          let state = String(format: "%03d", response["return_value"] as! Int)
-          self.currentState = state
-        }
-        catch {
-          print("error serializing JSON: \(error)")
-        }
+        let state = String(format: "%03d", response["return_value"] as! Int)
+        self.currentState = state
+      }
+      catch {
+        print("error serializing JSON: \(error)")
+      }
     }
     task.resume()
   }
@@ -76,47 +76,47 @@ class CloudController: NSObject, URLSessionDelegate {
     
     switch runInBackground {
     case true:
-        let backgroundSession = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "jadegraaf-Who-s-home.setstate"), delegate: self, delegateQueue: nil)
-        
-        let backgroundTask = backgroundSession.downloadTask(with: request)
-        
-        backgroundTask.resume()
-        
+      let backgroundSession = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "jadegraaf-Who-s-home.setstate"), delegate: self, delegateQueue: nil)
+
+      let backgroundTask = backgroundSession.downloadTask(with: request)
+
+      backgroundTask.resume()
+      
       break
     case false:
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                print("error=\(error)")
-                return
-            }
-            
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-                return
-            }
-            
-            do {
-              let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
-              
-              print(response);
-              
-              if response["return_value"] as! Int == 1 {
-                print("changeState command succesfull")
-              }
-              else {
-                print("changeState command unsuccesfull")
-                print("Response: \(response)")
-              }
-              
-            }
-            catch {
-                print("error serializing JSON: \(error)")
-            }
+      let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        guard let data = data, error == nil else {
+          print("error=\(error)")
+          return
         }
-        task.resume()
-    
-        break
+
+        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+          print("statusCode should be 200, but is \(httpStatus.statusCode)")
+          print("response = \(response)")
+          return
+        }
+
+        do {
+          let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
+
+          print(response);
+
+          if response["return_value"] as! Int == 1 {
+            print("changeState command succesfull")
+          }
+          else {
+            print("changeState command unsuccesfull")
+            print("Response: \(response)")
+          }
+
+        }
+        catch {
+          print("error serializing JSON: \(error)")
+        }
+      }
+      task.resume()
+
+      break
     }
   }
   

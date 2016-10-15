@@ -42,7 +42,7 @@ class ViewController: UIViewController {
   }
   
   override func viewDidLayoutSubviews() {
-  
+
     // Determing the current hour
     let currentHour = (Calendar.current as NSCalendar).component(.hour, from: Date())
     
@@ -73,7 +73,7 @@ class ViewController: UIViewController {
     case (sunSetHour+1)...23:
       backDropImage.image = UIImage(named: "Night backdrop")
       sunImage.image = UIImage(named: "Moon")
-  
+
       // Calculate the curation of the phase from which to detemine the relative position of the sun/moon from
       phaseDuration = 24 - sunSetHour+sunRiseHour
       
@@ -151,7 +151,7 @@ class ViewController: UIViewController {
       state[SettingsController().userId] = 1
       
       CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)1")
- 
+
       HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
       break
       
