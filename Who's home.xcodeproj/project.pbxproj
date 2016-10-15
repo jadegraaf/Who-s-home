@@ -11,6 +11,8 @@
 		D00B2FE91CEFB201000D46F6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00B2FE81CEFB201000D46F6 /* CoreLocation.framework */; };
 		D04FDC151CE91A8B006D8550 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04FDC141CE91A8B006D8550 /* SettingsViewController.swift */; };
 		D04FDC171CEA4851006D8550 /* CloudController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04FDC161CEA4851006D8550 /* CloudController.swift */; };
+		D0D51E2A1DAAA0F70077368F /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D51E291DAAA0F70077368F /* UserNotifications.framework */; };
+		D0D51E2C1DAAC1970077368F /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D51E2B1DAAC1970077368F /* NotificationController.swift */; };
 		D0FD08321CA73AA000B47B6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FD08311CA73AA000B47B6B /* AppDelegate.swift */; };
 		D0FD08341CA73AA000B47B6B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FD08331CA73AA000B47B6B /* ViewController.swift */; };
 		D0FD08371CA73AA000B47B6B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0FD08351CA73AA000B47B6B /* Main.storyboard */; };
@@ -43,6 +45,8 @@
 		D04FDC161CEA4851006D8550 /* CloudController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudController.swift; sourceTree = "<group>"; };
 		D050C4FC1CEF24630062FEE8 /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		D09794C31D02FFF600C60C6F /* photon-code.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "photon-code.c"; path = "Device/photon-code.c"; sourceTree = "<group>"; };
+		D0D51E291DAAA0F70077368F /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		D0D51E2B1DAAC1970077368F /* NotificationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
 		D0FD082E1CA73AA000B47B6B /* Who's home.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Who's home.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0FD08311CA73AA000B47B6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0FD08331CA73AA000B47B6B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0D51E2A1DAAA0F70077368F /* UserNotifications.framework in Frameworks */,
 				D00B2FE91CEFB201000D46F6 /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +92,7 @@
 		B3E56B6A762AA40B1BD3E278 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D0D51E291DAAA0F70077368F /* UserNotifications.framework */,
 				D00B2FE81CEFB201000D46F6 /* CoreLocation.framework */,
 			);
 			name = Frameworks;
@@ -128,6 +134,7 @@
 				D0FD083D1CA73AA000B47B6B /* Info.plist */,
 				D0FD08311CA73AA000B47B6B /* AppDelegate.swift */,
 				D04FDC161CEA4851006D8550 /* CloudController.swift */,
+				D0D51E2B1DAAC1970077368F /* NotificationController.swift */,
 				D050C4FC1CEF24630062FEE8 /* SettingsController.swift */,
 				D04FDC141CE91A8B006D8550 /* SettingsViewController.swift */,
 				D0FD08331CA73AA000B47B6B /* ViewController.swift */,
@@ -219,21 +226,24 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Joeri de graaf";
 				TargetAttributes = {
 					D0FD082D1CA73AA000B47B6B = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = D7T2SM46G4;
+						LastSwiftMigration = 0800;
 					};
 					D0FD08411CA73AA000B47B6B = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = D7T2SM46G4;
+						LastSwiftMigration = 0800;
 						TestTargetID = D0FD082D1CA73AA000B47B6B;
 					};
 					D0FD084C1CA73AA000B47B6B = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = D7T2SM46G4;
+						LastSwiftMigration = 0800;
 						TestTargetID = D0FD082D1CA73AA000B47B6B;
 					};
 				};
@@ -290,6 +300,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0D51E2C1DAAC1970077368F /* NotificationController.swift in Sources */,
 				D04FDC151CE91A8B006D8550 /* SettingsViewController.swift in Sources */,
 				D00B2FE71CEFA405000D46F6 /* SettingsController.swift in Sources */,
 				D0FD08341CA73AA000B47B6B /* ViewController.swift in Sources */,
@@ -363,8 +374,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -386,7 +399,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -411,8 +424,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -428,10 +443,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				VALIDATE_PRODUCT = YES;
@@ -444,13 +460,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				INFOPLIST_FILE = "Who's home/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.joeridegraaf.whoishome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9e7456d2-1cc1-426b-acc3-94875ad8ac3c";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -462,12 +479,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				INFOPLIST_FILE = "Who's home/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.joeridegraaf.whoishome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9e7456d2-1cc1-426b-acc3-94875ad8ac3c";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -481,6 +499,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-homeTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Who's home.app/Who's home";
 			};
 			name = Debug;
@@ -493,6 +512,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-homeTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Who's home.app/Who's home";
 			};
 			name = Release;
@@ -504,6 +524,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-homeUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = "Who's home";
 			};
 			name = Debug;
@@ -515,6 +536,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jadegraaf.Who-s-homeUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = "Who's home";
 			};
 			name = Release;

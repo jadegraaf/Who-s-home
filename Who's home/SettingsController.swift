@@ -9,53 +9,53 @@
 import Foundation
 
 class SettingsController: NSObject {
-  let settings = NSUserDefaults.standardUserDefaults()
+  let settings = UserDefaults.standard
   
   var userName: String{
     get {
-      return self.settings.stringForKey("Name")!
+      return self.settings.string(forKey: "Name")!
       }
     set {
-      self.settings.setObject(newValue, forKey: "Name")
+      self.settings.set(newValue, forKey: "Name")
     }
   }
   
   var userId: Int{
     get {
-      return self.settings.integerForKey("userId")
+      return self.settings.integer(forKey: "userId")
     }
     set {
-      self.settings.setInteger(newValue, forKey: "userId")
+      self.settings.set(newValue, forKey: "userId")
     }
   }
   
   var gpsState: Bool{
     get{
-      return self.settings.boolForKey("GPSEnabled")
+      return self.settings.bool(forKey: "GPSEnabled")
     }
     set{
-      self.settings.setBool(newValue, forKey: "GPSEnabled")
+      self.settings.set(newValue, forKey: "GPSEnabled")
     }
   }
 
   var notificationState: Bool{
     get{
-      return self.settings.boolForKey("NotificationsEnabled")
+      return self.settings.bool(forKey: "NotificationsEnabled")
     }
     set{
-      self.settings.setBool(newValue, forKey: "NotificationsEnabled")
+      self.settings.set(newValue, forKey: "NotificationsEnabled")
       
       if newValue == true {
-        NSNotificationCenter.defaultCenter().postNotificationName("registerNotifications", object: nil)
+        NotificationController.sharedInstance.scheduleDailyNotification()
       }
       else {
-        NSNotificationCenter.defaultCenter().postNotificationName("cancelNotifications", object: nil)
+        NotificationController.sharedInstance.removeDailyNotification()
       }
     }
   }
   
   func thisIsTheFirstRun()->Bool {
-    if self.settings.stringForKey("Name" ) == nil {
+    if self.settings.string(forKey: "Name" ) == nil {
       return true
     }
     return false

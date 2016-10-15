@@ -21,15 +21,15 @@ class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerVi
     
     // Hide the back button untill they selected a valid row if its the first run
     if SettingsController().thisIsTheFirstRun() {
-      self.BackButton.hidden = true
+      self.BackButton.isHidden = true
     }
     // Select the components to the state found in the settings if its not
     else {
       NamePicker.selectRow(SettingsController().userId+1, inComponent: 0, animated: true)
     }
     
-    GPSButton.on = SettingsController().gpsState
-    NotificationButton.on = SettingsController().notificationState
+    GPSButton.isOn = SettingsController().gpsState
+    NotificationButton.isOn = SettingsController().notificationState
   }
   
   // MARK Outlets
@@ -39,17 +39,17 @@ class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerVi
   @IBOutlet weak var BackButton: UIButton!
   
   // MARK: Actions
-  @IBAction func GPSButtonSwitched(sender: UISwitch) {
-    SettingsController().gpsState = GPSButton.on
+  @IBAction func GPSButtonSwitched(_ sender: UISwitch) {
+    SettingsController().gpsState = GPSButton.isOn
   }
-  @IBAction func NoticationButtonSwitched(sender: UISwitch) {
-    SettingsController().notificationState = NotificationButton.on
+  @IBAction func NoticationButtonSwitched(_ sender: UISwitch) {
+    SettingsController().notificationState = NotificationButton.isOn
   }
   
   // Capture the picker view selection
-  func pickerView(namePickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+  func pickerView(_ namePickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
     if row == 0 {
-      BackButton.hidden = true
+      BackButton.isHidden = true
     }
     else {
       // Store the user data
@@ -57,24 +57,24 @@ class SettingsViewController: UIViewController, UIPickerViewDelegate, UIPickerVi
       SettingsController().userName = self.namePickerData[row]
       
       // Show the back button again
-      BackButton.hidden = false
+      BackButton.isHidden = false
     }
   }
   
   // MARK: UIPicker stuff
   
   // The number of columns of data
-  func numberOfComponentsInPickerView(namePickerView: UIPickerView) -> Int {
+  func numberOfComponents(in namePickerView: UIPickerView) -> Int {
     return 1
   }
   
   // The number of rows of data
-  func pickerView(namePickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+  func pickerView(_ namePickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
     return namePickerData.count
   }
   
   // The data to return for the row and component (column) that's being passed in
-  func pickerView(namePickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+  func pickerView(_ namePickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
     return namePickerData[row]
   }
 }

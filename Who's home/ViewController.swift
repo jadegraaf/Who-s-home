@@ -17,37 +17,34 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    // Empty the current state
-    CloudController.sharedInstance.currentState = ""
-    
     // Fetch the current state from the cloud
     CloudController.sharedInstance.getState()
     
     // Show that the current state is being loaded
-    HomeImage.setImage(UIImage(named: "Loading"), forState: .Normal)
+    HomeImage.setImage(UIImage(named: "Loading"), for: UIControlState())
     // TODO: show an error message if loading failed after x seconds
     
     // Start to listen for a state change broadcast
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHouseImage), name: "setHouseImage", object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(showLoadingActifityMonitor), name: "fetchingState", object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(setHouseImage), name: NSNotification.Name(rawValue: "setHouseImage"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(showLoadingActifityMonitor), name: NSNotification.Name(rawValue: "fetchingState"), object: nil)
   }
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     // Check if this is the first run and segueway to the settings screen if so
     if (SettingsController().thisIsTheFirstRun() == true){
-      self.performSegueWithIdentifier("goToSettings", sender: self)
+      self.performSegue(withIdentifier: "goToSettings", sender: self)
     }
   }
   
-  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     // Remove the observers to prevent the house image from being updated multiple times after going to the settings screen
-    NSNotificationCenter.defaultCenter().removeObserver(self)
+    NotificationCenter.default.removeObserver(self)
   }
   
   override func viewDidLayoutSubviews() {
   
     // Determing the current hour
-    let currentHour = NSCalendar.currentCalendar().component(.Hour, fromDate: NSDate())
+    let currentHour = (Calendar.current as NSCalendar).component(.hour, from: Date())
     
     // How far are we in the current day/night phase?
     var momentInPhase = 0
@@ -96,8 +93,8 @@ class ViewController: UIViewController {
     }
     
     // Get the width and height of the screen, used to determing the position proportionaly to the background image
-    let screenWidth = UIScreen.mainScreen().bounds.width
-    let screenHeight = UIScreen.mainScreen().bounds.height-40
+    let screenWidth = UIScreen.main.bounds.width
+    let screenHeight = UIScreen.main.bounds.height-40
     
     // The arc of the sun is highest at 71% of the screen height
     let radius = screenHeight * 0.71
@@ -139,14 +136,14 @@ class ViewController: UIViewController {
     }
     
     // Start a timer after which to enable user interaction with the button again
-    _ = NSTimer.scheduledTimerWithTimeInterval(5, target: self, selector: #selector(enableHouseImageInteraction), userInfo: nil, repeats: false)
-    self.HomeImage.userInteractionEnabled = false
+    _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(enableHouseImageInteraction), userInfo: nil, repeats: false)
+    self.HomeImage.isUserInteractionEnabled = false
     
     // Get the current house state from the CloudController
     var state = CloudController.sharedInstance.getHouseStateAsArray()
     
     // Get the first letter of the current username
-    let firstLetterOfUserName = SettingsController().userName[SettingsController().userName.startIndex.advancedBy(0)]
+    let firstLetterOfUserName = SettingsController().userName[SettingsController().userName.characters.index(SettingsController().userName.startIndex, offsetBy: 0)]
 
     // Determine which house to change based on the userID and pushes the change to the CloudController
     switch state[SettingsController().userId] {
@@ -155,7 +152,7 @@ class ViewController: UIViewController {
       
       CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)1")
  
-      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
+      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
       break
       
     case 1:
@@ -163,7 +160,7 @@ class ViewController: UIViewController {
       
       CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)0")
       
-      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
+      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
       break
     default: break
     }
@@ -174,29 +171,29 @@ class ViewController: UIViewController {
   func setHouseImage(){
     self.StateHasLoaded = true
     
-    dispatch_async(dispatch_get_main_queue(), {
-      self.LoadingStack.hidden = true
+    DispatchQueue.main.async(execute: {
+      self.LoadingStack.isHidden = true
       self.LoadingIndicator.stopAnimating()
     })
     
     print("Going to change the house image to \(CloudController.sharedInstance.currentState)")
     
     // Set the HomeImage to the current state
-    dispatch_async(dispatch_get_main_queue(), {
-      self.HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), forState: .Normal)
+    DispatchQueue.main.async(execute: {
+      self.HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
     })
   }
   
   // Disables interaction with the house image for 5 seconds to prevent the user from spamming it. You know who are you....
   func enableHouseImageInteraction() {
-    self.HomeImage.userInteractionEnabled = true
+    self.HomeImage.isUserInteractionEnabled = true
   }
   
   // Shows the 'Loading' activity monitor
   func showLoadingActifityMonitor() {
     self.StateHasLoaded = false
     
-    self.LoadingStack.hidden = false
+    self.LoadingStack.isHidden = false
     self.LoadingIndicator.startAnimating()
   }
 }

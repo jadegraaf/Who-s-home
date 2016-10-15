@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CloudController: NSObject, NSURLSessionDelegate {
+class CloudController: NSObject, URLSessionDelegate {
   static let sharedInstance = CloudController()
   
   let accessToken = "040b519d727af3e70a99e051f39624ba08515e5b"
@@ -18,7 +18,8 @@ class CloudController: NSObject, NSURLSessionDelegate {
   var currentState = ""{
     didSet {
       // Broadcast a notification to the ViewController to updated the screen
-      NSNotificationCenter.defaultCenter().postNotificationName("setHouseImage", object: nil)
+      NotificationCenter.default.post(name: Notification.Name(rawValue: "setHouseImage"), object: nil)
+      print("Current State: \(currentState)")
     }
   }
   
@@ -26,36 +27,33 @@ class CloudController: NSObject, NSURLSessionDelegate {
     super.init()
     
     // Observe if the app enters the foreground, then fetch the current state
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(getState), name: "UIApplicationWillEnterForegroundNotification", object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(getState), name: NSNotification.Name(rawValue: "UIApplicationWillEnterForegroundNotification"), object: nil)
   }
   
   // Fetches the current state from the cloud
   func getState() {
+    print("Fetching Current state")
     // Broadcast that the state is being loaded
-    NSNotificationCenter.defaultCenter().postNotificationName("fetchingState", object: nil)
+    NotificationCenter.default.post(name: Notification.Name(rawValue: "fetchingState"), object: nil)
     
-    let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
-    
-    let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState");
-    let request : NSMutableURLRequest = NSMutableURLRequest()
-
-    request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
-    request.HTTPMethod = "POST"
-    request.timeoutInterval = 30
-    request.addValue("application/json", forHTTPHeaderField: "Accept")
-    request.HTTPBody  = "arg=&access_token=\(self.accessToken)".dataUsingEncoding(NSUTF8StringEncoding)
-    
-    let dataTask = session.dataTaskWithRequest(request) {
-      (let data: NSData?, let response: NSURLResponse?, let error: NSError?) -> Void in
-      guard let httpResponse = response as? NSHTTPURLResponse, receivedData = data
-        else {
-          print("error: not a valid http response")
-          return
-      }
-      switch (httpResponse.statusCode) {
-      case 200:
+    var request = URLRequest(url: URL(string: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState")!)
+    request.httpMethod = "POST"
+    let postString = "arg=&access_token=\(self.accessToken)"
+    request.httpBody = postString.data(using: .utf8)
+    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        guard let data = data, error == nil else {
+            print("error=\(error)")
+            return
+        }
+        
+        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+            print("statusCode should be 200, but is \(httpStatus.statusCode)")
+            print("response = \(response)")
+            return
+        }
+        
         do {
-          let response = try NSJSONSerialization.JSONObjectWithData(receivedData, options: .AllowFragments)
+            let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
           
           let state = String(format: "%03d", response["return_value"] as! Int)
           self.currentState = state
@@ -63,81 +61,67 @@ class CloudController: NSObject, NSURLSessionDelegate {
         catch {
           print("error serializing JSON: \(error)")
         }
-      case 400:
-        print("Invalid POST request")
-      break
-        
-      default:
-        print("POST request got response \(httpResponse.statusCode)")
-      }
     }
-    dataTask.resume()
+    task.resume()
   }
   
   // Pushes the change in state to the cloud. Run in the background if called from a notification action
-  func changeState(command: String, runInBackground: Bool) {
-    let urlString = NSString(format: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState");
- 
-    let request : NSMutableURLRequest = NSMutableURLRequest()
-    request.URL = NSURL(string: NSString(format: "%@", urlString)as String)
-    request.HTTPMethod = "POST"
-    request.timeoutInterval = 30
-    request.HTTPBody  = "arg=\(command)&access_token=\(self.accessToken)".dataUsingEncoding(NSUTF8StringEncoding)
-
+  func changeState(_ command: String, runInBackground: Bool) {
+    print("Sending command \(command) to particle")
+    
+    var request = URLRequest(url: URL(string: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/changeState")!)
+    request.httpMethod = "POST"
+    let postString = "arg=\(command)&access_token=\(self.accessToken)"
+    request.httpBody = postString.data(using: .utf8)
+    
     switch runInBackground {
     case true:
-      
-      let backgroundSession = NSURLSession(configuration: NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("changeState"), delegate: CloudController.sharedInstance, delegateQueue: nil)
-      
-      // Uses downloadTask due to iOS not allowing dataTask in the background
-      let dataTask = backgroundSession.downloadTaskWithRequest(request)
-      
-      dataTask.resume()
-      
+        let backgroundSession = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "jadegraaf-Who-s-home.setstate"), delegate: self, delegateQueue: nil)
+        
+        let backgroundTask = backgroundSession.downloadTask(with: request)
+        
+        backgroundTask.resume()
+        
       break
     case false:
-      
-      let  session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
-      
-      let dataTask = session.dataTaskWithRequest(request) {
-        (let data: NSData?, let response: NSURLResponse?, let error: NSError?) -> Void in
-        guard let httpResponse = response as? NSHTTPURLResponse, receivedData = data
-          else {
-            print("error: not a valid http response")
-            return
-        }
-        switch (httpResponse.statusCode) {
-        case 200:
-          do {
-            let response = try NSJSONSerialization.JSONObjectWithData(receivedData, options: .AllowFragments)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                print("error=\(error)")
+                return
+            }
             
-            if (response["return_value"] as! Int == 0) {
-              print("Not able to push state")
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(response)")
+                return
             }
-            else {
-              print("Pushed state \(response["return_value"]) succcesfully)")
+            
+            do {
+              let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
+              
+              print(response);
+              
+              if response["return_value"] as! Int == 1 {
+                print("changeState command succesfull")
+              }
+              else {
+                print("changeState command unsuccesfull")
+                print("Response: \(response)")
+              }
+              
             }
-          }
-          catch {
-            print("error serializing JSON: \(error)")
-          }
-        case 400:
-          print("Invalid POST request")
-          break
-          
-        default:
-          print("POST request got response \(httpResponse.statusCode)")
+            catch {
+                print("error serializing JSON: \(error)")
+            }
         }
-      }
-      
-      dataTask.resume()
-      
-      break
+        task.resume()
+    
+        break
     }
   }
   
   // Updates the current state from the array computed in the ViewController
-  func updateCurrentState(state: Array<Int>, command: String){
+  func updateCurrentState(_ state: Array<Int>, command: String){
     var stateAsString = ""
     
     for element in state {
@@ -156,25 +140,5 @@ class CloudController: NSObject, NSURLSessionDelegate {
     return self.currentState.characters.flatMap {
       Int(String($0))
     }
-  }
-  
-  func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-    
-  }
-  
-  func URLSession(session: NSURLSession,
-                  task: NSURLSessionTask,
-                  didCompleteWithError error: NSError?){
-    if (error != nil) {
-      print(error?.description)
-    }else{
-      print("The task finished transferring data successfully")
-    }
-  }
-  
-  func URLSession(session: NSURLSession,
-                  downloadTask: NSURLSessionDownloadTask,
-                  didFinishDownloadingToURL location: NSURL){
-    //print(downloadTask.response)
   }
 }
