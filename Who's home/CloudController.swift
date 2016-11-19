@@ -9,7 +9,7 @@
 import Foundation
 
 class CloudController: NSObject, URLSessionDelegate {
-  static let sharedInstance = CloudController()
+  //static let sharedInstance = CloudController()
   
   let accessToken = "040b519d727af3e70a99e051f39624ba08515e5b"
   let deviceId = "400021001247343339383037"
@@ -17,24 +17,20 @@ class CloudController: NSObject, URLSessionDelegate {
   
   var currentState = ""{
     didSet {
-      // Broadcast a notification to the ViewController to updated the screen
-      NotificationCenter.default.post(name: Notification.Name(rawValue: "setHouseImage"), object: nil)
       print("Current State: \(currentState)")
     }
   }
   
+  var delegate: CloudControllerDelegate? = nil
+  
   override init() {
     super.init()
-    
-    // Observe if the app enters the foreground, then fetch the current state
-    NotificationCenter.default.addObserver(self, selector: #selector(getState), name: NSNotification.Name(rawValue: "UIApplicationWillEnterForegroundNotification"), object: nil)
+  
   }
   
   // Fetches the current state from the cloud
   func getState() {
     print("Fetching Current state")
-    // Broadcast that the state is being loaded
-    NotificationCenter.default.post(name: Notification.Name(rawValue: "fetchingState"), object: nil)
     
     var request = URLRequest(url: URL(string: "\(self.particleAPIBaseUrl)/v1/devices/\(self.deviceId)/getState")!)
     request.httpMethod = "POST"
@@ -56,7 +52,9 @@ class CloudController: NSObject, URLSessionDelegate {
         let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
         
         let state = String(format: "%03d", response["return_value"] as! Int)
+        
         self.currentState = state
+        self.delegate?.hasRecievedNewHouseState(state: state)
       }
       catch {
         print("error serializing JSON: \(error)")
@@ -141,4 +139,10 @@ class CloudController: NSObject, URLSessionDelegate {
       Int(String($0))
     }
   }
+}
+
+protocol CloudControllerDelegate {
+  func hasRecievedNewHouseState(state: String)
+  func failedRecievingHouseState(error: String)
+  func loadingHouseStateInProgress()
 }

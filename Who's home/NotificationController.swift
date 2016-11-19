@@ -79,7 +79,8 @@ class NotificationController: NSObject, UNUserNotificationCenterDelegate {
             print("command: \(command)")
             
             // Send the command
-            CloudController.sharedInstance.changeState(command, runInBackground: true)
+            let cloudController = CloudController()
+            cloudController.changeState(command, runInBackground: true)
                         
         case "userWantsToBeAskedLater":
             // Reschedule the notification

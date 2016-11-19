@@ -8,39 +8,37 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CloudControllerDelegate {
   
   var StateHasLoaded = false
   var userHasClickedHouseImage = false
+  
+  let cloudController = CloudController()
 
   //override func
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    // Set the delegate of the cloudController to self
+    cloudController.delegate = self
+    
     // Fetch the current state from the cloud
-    CloudController.sharedInstance.getState()
+    cloudController.getState()
     
     // Show that the current state is being loaded
     HomeImage.setImage(UIImage(named: "Loading"), for: UIControlState())
-    // TODO: show an error message if loading failed after x seconds
     
-    // Start to listen for a state change broadcast
-    NotificationCenter.default.addObserver(self, selector: #selector(setHouseImage), name: NSNotification.Name(rawValue: "setHouseImage"), object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(showLoadingActifityMonitor), name: NSNotification.Name(rawValue: "fetchingState"), object: nil)
+    // Observe if the app enters the foreground, to fetch the current state
+    NotificationCenter.default.addObserver(self, selector: #selector(appBecameActive), name: NSNotification.Name(rawValue: "UIApplicationWillEnterForegroundNotification"), object: nil)
   }
   
   override func viewDidAppear(_ animated: Bool) {
-    // Check if this is the first run and segueway to the settings screen if so
+    // Check if this is the first run and segue to the settings screen if so
     if (SettingsController().thisIsTheFirstRun() == true){
       self.performSegue(withIdentifier: "goToSettings", sender: self)
     }
   }
-  
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    // Remove the observers to prevent the house image from being updated multiple times after going to the settings screen
-    NotificationCenter.default.removeObserver(self)
-  }
-  
+    
   override func viewDidLayoutSubviews() {
 
     // Determing the current hour
@@ -130,7 +128,7 @@ class ViewController: UIViewController {
   // MARK: Actions
   @IBAction func HomeImageClicked() {
     // Determine if the current house state has succesfully been loaded otherwise ignore the action
-    if CloudController.sharedInstance.currentState == ""{
+    if cloudController.currentState == ""{
       print("State not fetched yet!")
       return
     }
@@ -140,7 +138,7 @@ class ViewController: UIViewController {
     self.HomeImage.isUserInteractionEnabled = false
     
     // Get the current house state from the CloudController
-    var state = CloudController.sharedInstance.getHouseStateAsArray()
+    var state = cloudController.getHouseStateAsArray()
     
     // Get the first letter of the current username
     let firstLetterOfUserName = SettingsController().userName[SettingsController().userName.characters.index(SettingsController().userName.startIndex, offsetBy: 0)]
@@ -150,17 +148,17 @@ class ViewController: UIViewController {
     case 0:
       state[SettingsController().userId] = 1
       
-      CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)1")
+      cloudController.updateCurrentState(state, command: "\(firstLetterOfUserName)1")
 
-      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
+      HomeImage.setImage(UIImage(named: cloudController.currentState), for: UIControlState())
       break
       
     case 1:
       state[SettingsController().userId] = 0
       
-      CloudController.sharedInstance.updateCurrentState(state, command: "\(firstLetterOfUserName)0")
+      cloudController.updateCurrentState(state, command: "\(firstLetterOfUserName)0")
       
-      HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
+      HomeImage.setImage(UIImage(named: cloudController.currentState), for: UIControlState())
       break
     default: break
     }
@@ -168,20 +166,35 @@ class ViewController: UIViewController {
   
   // MARK: Functions
   // Called once the active CloudlController has made a connection and fetched the state and updates the screen with the right house status representation image
-  func setHouseImage(){
+  func hasRecievedNewHouseState(state: String) {
     self.StateHasLoaded = true
     
     DispatchQueue.main.async(execute: {
       self.LoadingStack.isHidden = true
       self.LoadingIndicator.stopAnimating()
+      
+      // Set the HomeImage to the current state
+      self.HomeImage.setImage(UIImage(named: state), for: UIControlState())
     })
     
-    print("Going to change the house image to \(CloudController.sharedInstance.currentState)")
+    print("Going to change the house image to \(state)")
+  }
+  
+  // Show an error icon on the screen
+  func failedRecievingHouseState(error: String) {
+    // TODO: Show exclamation mark
+  }
+  
+  func loadingHouseStateInProgress() {
+    // Show that the current state is being loaded
+    HomeImage.setImage(UIImage(named: "Loading"), for: UIControlState())
     
-    // Set the HomeImage to the current state
-    DispatchQueue.main.async(execute: {
-      self.HomeImage.setImage(UIImage(named: CloudController.sharedInstance.currentState), for: UIControlState())
-    })
+    showLoadingActifityMonitor()
+  }
+  
+  // Called when the application comes to to the foreground
+  func appBecameActive() {
+    cloudController.getState()
   }
   
   // Disables interaction with the house image for 5 seconds to prevent the user from spamming it. You know who are you....
